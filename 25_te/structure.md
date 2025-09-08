@@ -1,0 +1,103 @@
+# 概述
+
+- network
+    -definition
+        - **自治** 、互连、集合体
+    - 功能
+        - data**通**信、资源**共**享、分布式 | 可靠
+            - not include:独立
+        - 最基本：
+            - data通信
+        - 
+        - 逻辑function：
+            - 通信子网
+                - 网桥、switch、Router等 ← 通信处理机、线路、设备etc
+                - 拓扑结构
+            - 资源..
+                - computer软件← 软件、信息
+
+- 交换technique
+    - 分组
+        - eg.以太网
+        - compared to报文
+            - 传播单位 更small
+            - fixed固定最大长度
+                - ↑减少 传输delay
+        - drawback：
+            - 附加info 开销大
+        - --
+        - 无Link分组:Datagram数据报
+            - every group 独立路由
+                - **Path** 、order might不同
+
+    - 电路
+        - 时延min，无差错
+    - 报文
+---
+- count
+    - > 1B=8b
+    - > 1MB=2^10KB
+        - >速率related，换算1M=10^6 ←科学计数
+        ---
+    - 最大数据**发送**v（==带宽==）
+        - $v=\frac{byte_{欲发}}{t_发}$
+        - highest理论v：
+            -  set: A → B
+                - up to $\min \\{V_A,V_B，path带宽 \\}$
+        - when $t_{发送delay}=t_{传播delay}$）
+            -  use $V_发=V_传$
+        ---
+    - 分组$t_{总}$
+        - 2段path+1Router [流水线]
+            - > draw Gantt：横t，竖 分组1 分组2
+                - $t_总=t_{分组1}+t_{剩余}$(图中横总
+                    - $t_{分组1}=2t_{链路传输}+t_{Router}$
+                    - $t_{..2}$同1but need看图等待
+            ---
+        - include 分组头：
+            - $t=t_{H_1发}+2t_{Router_{last}}$
+                - $t_{H_1发}=\frac{总data大小}{v_{传输}}$
+                    - $总data大小=组{\color{green}数}*分组大小$
+                        - $组{\color{green}数}=\frac{file大小}{实际容量}$
+                            - 实际容量=分组大小-分组头
+                - $t_{{Router}_{last}}$
+                    - 2* $\frac{1个分组大小}{v_{传输}}$
+                        - 前999个分组都包含在send时间内
+                        - 选2个Router线路 ←题求 至少
+         - --
+     - 报文$t$
+        - $t=t_发+t_{Router}$
+            - 2*$t_发$← usually $v_传$ same
+
+`时延can be regarded as 时间`
+    ---
+- 奈氏count：
+    - 最大数据传送v:
+        - $2Wlog_2V$
+            - W:带宽
+            - V: 码元
+        - 反求V
+---
+- 综合：分组related
+    - count：开销+1 lost(已知
+        - 设 分组数据大小=D
+            - >here的有效数据大小 is 分组大小
+            - 开销+1 lost=$N+1D$
+                - $N=开销*组数$
+            - 求best D, make y(开销+lost)min
+                - 构造表达式，求min ←y'=0
+        ---
+    - discuss:
+        - 逐个check单个分组 or received whole check File
+            - if 网络 Not 可靠
+                - 逐个
+            - else
+                - whole file (单个丢失，整个重传
+---
+---
+# model
+- 分层
+    - goal
+        - 标准语言、..界面、功能间独立性
+        - no
+            - defin功能 执行方法
