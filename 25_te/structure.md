@@ -61,7 +61,7 @@
                         - $组{\color{green}数}=\frac{file大小}{实际容量}$
                             - 实际容量=分组大小-分组头
                 - $t_{{Router}_{last}}$
-                    - 2* $\frac{1个分组大小}{v_{传输}}$
+                    - 2*$\frac{1个分组大小}{v_{传输}}$
                         - 前999个分组都包含在send时间内
                         - 选2个Router线路 ←题求 至少
          - --
@@ -101,3 +101,116 @@
         - 标准语言、..界面、功能间独立性
         - no
             - defin功能 执行方法
+
+- 实体
+    - is 软件/硬件
+        - to实现该layer功能
+    - 协议
+        - 通信的规则or约定
+            - between 不同结点对等实体
+
+    ---
+- OSI
+    - n层为n+1层服务
+        - eg.数据链路for 网络层实体
+            - provide data 发送、接收及过程
+    - 各层provide各自 差错control
+        - eg.
+            - bit流 ←物理
+            - 帧 ← data链路
+            - 打印 ←应用
+    - 3main概念
+        - 服务 接口 协议
+            - 协议
+                - 3要素
+                    - 语法、语义、同步(时序)
+                        - TCP中 "三握"belongs to
+                            - 时序
+                                - (先后顺序
+                        - 语法
+                            - 信息'格式
+                                - eg.IPv4首部
+    - 未define 各layer接口'实现
+        - left to 各 协议&standard
+    - --
+    - 各layer
+        - 应用
+        - 表示
+            - data解密与加密、压缩、format转换
+        - 会话
+            - 会话管理&同步
+                - eg.file插入同步点or检查(检验)点
+            - 
+        - --
+        - ==**传输**==
+            - 通信
+                - 主机++进程++
+                - 端2端_（传输层及以上）_
+                    - 应答、分组排序，流量control
+                        - 流量control←2、3、4layer (mainly
+                            - 2：点2点
+                            - 3：whole net
+                            - 4: 端2端
+            - PDU called as
+                - 数据段
+                    - add 源端口信息、目的..
+                    - 
+        - **网络**
+            - provide 无连接，面向连接
+                - _(O网，T传_
+            - 封装成 分组 add
+                - 第三层'PCI
+                    - protocol control information协议控制信息
+                        - (地址、控制info
+            - host2host
+                - Router选择、拥塞控制，网际互连etc
+        - --
+        - 数据链路
+            - **点2点**
+                - 物理线路→数据链路
+            - don't own 拥塞control
+            - add in分组
+                - 源地址、目的..
+                - control信息
+            
+        - 物理
+            - don't have Next，故 不封装
+            - equipment
+                - 中继、集线器hub(<span style="color:lightgray">多port..</span>)
+
+    ---
+- TCP/IP
+    - > 实际执行standard；互联网核心tech
+    - 各layer
+        - 应用
+            - 服务访问点(SAP
+                - 接口of上下layer实体
+                - called as
+                    - 用户程序
+                    - 
+        - ==传输==
+            - sap
+                - port号
+            - 无连接，面向..
+                - 可靠、流量control、错误校正etc
+        - 网络
+            - sap
+                - IP数据报’protocol字段
+            - only 无连接(不可靠
+                - can't 点2点'流量control
+                    - _osi can_
+        - --
+        - 数据链路
+            - sap
+                - 帧'type
+
+    ---
+
+？模型各层间顺序究竟是自上而下，还是自下而上？ 为什么第n层为第n+1层提供服务，但数据链路又是将 有差错的物理线路转换为无差错的数据链路？
+    ---
+- ARPAnet
+    - first 计网
+
+---
+count：
+
