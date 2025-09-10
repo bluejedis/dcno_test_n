@@ -132,7 +132,7 @@
                                 - eg.IPv4首部
     - 未define 各layer接口'实现
         - left to 各 协议&standard
-    - --
+        - --
     - 各layer
         - 应用
         - 表示
@@ -141,7 +141,7 @@
             - 会话管理&同步
                 - eg.file插入同步点or检查(检验)点
             - 
-        - --
+            - --
         - ==**传输**==
             - 通信
                 - 主机++进程++
@@ -164,7 +164,7 @@
                         - (地址、控制info
             - host2host
                 - Router选择、拥塞控制，网际互连etc
-        - --
+            - --
         - 数据链路
             - **点2点**
                 - 物理线路→数据链路
@@ -173,8 +173,86 @@
                 - 源地址、目的..
                 - control信息
             
-        - 物理
+        - **物理**
             - don't have Next，故 不封装
+            - 通信base:
+                - element
+                    - computer内部data传输
+                        - 并行
+                            - feature: d短 v快
+                                - communication way:
+                                    - 同步、异步
+                    - 信道
+                        - 通信'电路contain
+                            - 双向..
+                                - 2信道
+                                    - send..，receive..
+                            - 多user共用
+                                - every user have
+                    - count related:
+                        - 传输v
+                            - >每秒bit数
+                            - $V_max$
+                                - 影响因素
+                                    - 信道带宽
+                                    - 信噪比 _（香农）_
+                                - count
+                                    - 无noise
+                                        - 奈：$2Wlog_2V$
+                                            - w:信道
+                                            - v:种类
+                                                - 状态、级别etc
+                                    - 信噪比$\frac{S}{N}$
+                                        - 香：$Wlog_2{1+\frac{S}{N}}$
+                                            - attention:
+                                                - 含 隐藏==种类==
+                                                    - $\min\\{奈,香\\}$
+                                                - S/N
+                                                    - 为dB需换算
+                                                        - $S/N=10^{\frac{x}{10}}$
+                                                    - 信号功率S、噪声功率N 
+                                                        - 代入
+                                                - $w=f_{上限}-f_{下限}$
+                        - Baud率
+                            - >每秒 变化次数
+                            - 求数据率
+                                - ensure编码方式
+                                    - 以太网→曼切斯特
+                                        - 1位数据(bit) need 2电平
+                                        - ∴data率=1/2baud率
+                            - 求 码元数'有效离散值
+                                - $bit率=baud率×k$($n=2^k$
+                                    - k为 1码元contain'bit数
+                                - eg.baud率=1000Baud，v=4kb/s
+                                    - ∴k=v/baud率=4
+                                        - n=2^4
+                - code 调制
+                    - 编码
+                        - 曼切斯特code
+                            - signal contain
+                                - 时钟
+                                    - 中间跳变
+                                - data
+                                    - different 跳变way
+                            - wave
+                                - 假定：中间 上/下跳is1
+                            
+                                ---
+
+                            - 引入reason
+                                - 同步
+                                    - 收发双方'data
+                            - 适用于
+                                - 二进制digital
+                    - 调制
+                        - >data→模拟
+                        - 4调制
+                            - QAM
+               
+             - --
+
+            - transport**介质**：
+                - 
             - equipment
                 - 中继、集线器hub(<span style="color:lightgray">多port..</span>)
 
@@ -199,7 +277,7 @@
             - only 无连接(不可靠
                 - can't 点2点'流量control
                     - _osi can_
-        - --
+            - --
         - 数据链路
             - sap
                 - 帧'type
@@ -207,10 +285,17 @@
     ---
 
 ？模型各层间顺序究竟是自上而下，还是自下而上？ 为什么第n层为第n+1层提供服务，但数据链路又是将 有差错的物理线路转换为无差错的数据链路？
+
     ---
 - ARPAnet
     - first 计网
 
 ---
 count：
+
+- 物理
+- 数据链路
+- 网络
+- 传输
+- 应用
 
