@@ -158,6 +158,11 @@
         - **网络**
             - provide 无连接，面向连接
                 - _(O网，T传_
+                    - link都是 有确认
+                        - ∴ only3link way
+                            - 无确认无连接
+                            - 有..无..
+                            - 有..面向..
             - 封装成 分组 add
                 - 第三层'PCI
                     - protocol control information协议控制信息
@@ -361,6 +366,8 @@
         - data链路层 protocol
             - can不同
                 - ↑ 物理层can't识别
+    - 为终端结点隐蔽物理传输'细节
+        - 无差别bit传输
     - --
     - 2q
         - 关于"连接"
@@ -370,6 +377,46 @@
             - 确实描述repeater和hub不准确，很笼统说法，选更错的
         
 ## 数据链路
+- function
+    - control对 物理传输介质'访问
+        - MAC层
+    - avoid帧丢失'method
+        - 计时器 超时重发
+    - protocol
+        - HDLC 
+        - PPP←SLIP
+- 组帧
+    - HDLC组帧
+        - default 0bit填充
+    - 3way运用
+        - 字符count
+            - 开头use 二进制 count total字符数(include自身
+        - 首尾add FLAG
+            - 字节填充
+            - 0bit
+- ==3control==
+    - 差错..
+        - 检错
+            - ？？奇偶校验码
+                - >only detect奇数个bit error
+                - 附加1个检验位
+                    - >奇偶，is 最终滤网，规定则过
+                        - code_origin
+                            - meet，写0
+                            - 不..，则要+1 去meet
+                    
+            - ==CRC==
+                - >can detect all 单bit error
+        - hamming←纠错
+            - >纠正一位
+            
+    - 流量..，可靠传输
+        - 流量..
+            - >actually control 发送方 data流量
+            - 
+    - 介质访问
+- LAN WAN
+- 设备
 ## △网络
 ## ➹传输
 ## 应用
