@@ -1,7 +1,7 @@
 # 概述
 
 - network
-    -definition
+    - definition
         - **自治** 、互连、集合体
     - 功能
         - data**通**信、资源**共**享、分布式 | 可靠
@@ -145,7 +145,7 @@
         - ==**传输**==
             - 通信
                 - 主机++进程++
-                - 端2端_（传输层及以上）_
+                - 端2端 (_传输层及以上_
                     - 应答、分组排序，流量control
                         - 流量control←2、3、4layer (mainly
                             - 2：点2点
@@ -175,84 +175,6 @@
             
         - **物理**
             - don't have Next，故 不封装
-            - 通信base:
-                - element
-                    - computer内部data传输
-                        - 并行
-                            - feature: d短 v快
-                                - communication way:
-                                    - 同步、异步
-                    - 信道
-                        - 通信'电路contain
-                            - 双向..
-                                - 2信道
-                                    - send..，receive..
-                            - 多user共用
-                                - every user have
-                    - count related:
-                        - 传输v
-                            - >每秒bit数
-                            - $V_max$
-                                - 影响因素
-                                    - 信道带宽
-                                    - 信噪比 _（香农）_
-                                - count
-                                    - 无noise
-                                        - 奈：$2Wlog_2V$
-                                            - w:信道
-                                            - v:种类
-                                                - 状态、级别etc
-                                    - 信噪比$\frac{S}{N}$
-                                        - 香：$Wlog_2{1+\frac{S}{N}}$
-                                            - attention:
-                                                - 含 隐藏==种类==
-                                                    - $\min\\{奈,香\\}$
-                                                - S/N
-                                                    - 为dB需换算
-                                                        - $S/N=10^{\frac{x}{10}}$
-                                                    - 信号功率S、噪声功率N 
-                                                        - 代入
-                                                - $w=f_{上限}-f_{下限}$
-                        - Baud率
-                            - >每秒 变化次数
-                            - 求数据率
-                                - ensure编码方式
-                                    - 以太网→曼切斯特
-                                        - 1位数据(bit) need 2电平
-                                        - ∴data率=1/2baud率
-                            - 求 码元数'有效离散值
-                                - $bit率=baud率×k$($n=2^k$
-                                    - k为 1码元contain'bit数
-                                - eg.baud率=1000Baud，v=4kb/s
-                                    - ∴k=v/baud率=4
-                                        - n=2^4
-                - code 调制
-                    - 编码
-                        - 曼切斯特code
-                            - signal contain
-                                - 时钟
-                                    - 中间跳变
-                                - data
-                                    - different 跳变way
-                            - wave
-                                - 假定：中间 上/下跳is1
-                            
-                                ---
-
-                            - 引入reason
-                                - 同步
-                                    - 收发双方'data
-                            - 适用于
-                                - 二进制digital
-                    - 调制
-                        - >data→模拟
-                        - 4调制
-                            - QAM
-               
-             - --
-
-            - transport**介质**：
-                - 
             - equipment
                 - 中继、集线器hub(<span style="color:lightgray">多port..</span>)
 
@@ -283,19 +205,172 @@
                 - 帧'type
 
     ---
+- ARPAnet
+    - first 计网
+    ---
 
 ？模型各层间顺序究竟是自上而下，还是自下而上？ 为什么第n层为第n+1层提供服务，但数据链路又是将 有差错的物理线路转换为无差错的数据链路？
 
-    ---
-- ARPAnet
-    - first 计网
-
+   
 ---
-count：
+# detail
+## 物理(left 
 
-- 物理
-- 数据链路
-- 网络
-- 传输
-- 应用
+- **通信base**:
+    - element
+        - computer内部data传输
+            - 并行
+                - feature: d短 v快
+                    - communication way:
+                        - 同步、异步
+        - 信道
+            - 通信'电路contain
+                - 双向..
+                    - 2信道
+                        - send..，receive..
+                - 多user共用
+                    - every user have
+        - count related:
+            - 传输v
+                - >每秒bit数
+                - $V_max$
+                    - 影响因素
+                        - 信道带宽
+                        - 信噪比 _（香农）_
+                        - count
+                            - 无noise
+                                - 奈：$2Wlog_2V$
+                                    - w:信道
+                                    - v:种类
+                                        - 状态、级别etc
+                            - 信噪比$\frac{S}{N}$
+                                - 香：$Wlog_2{1+\frac{S}{N}}$
+                                - attention:
+                                    - 含 隐藏==种类==
+                                        - $\min\\{奈,香\\}$
+                                    - S/N
+                                        - 为dB需换算
+                                            - $S/N=10^{\frac{x}{10}}$
+                                        - 信号功率S、噪声功率N 
+                                            - 代入
+                                    - $w=f_{上限}-f_{下限}$
+            - Baud率
+                - >每秒 变化次数
+                - 求数据率
+                    - ensure编码方式
+                        - 以太网→曼切斯特
+                            - 1位数据(bit) need 2电平
+                            - ∴data率=1/2baud率
+                - 求 码元数'有效离散值
+                    - $bit率=baud率×k$($n=2^k$
+                        - k为 1码元contain'bit数
+                    - eg.baud率=1000Baud，v=4kb/s
+                        - ∴k=v/baud率=4
+                            - n=2^4
+    - code 调制
+        - **编码**
+            - >digital数据 coded as digital signal；<span style="color:lightgray">模拟数据..</span>
+            - 曼切斯特code
+                - signal contain
+                    - 时钟
+                        - 中间跳变
+                    - data
+                        - different 跳变way
+                - wave
+                    - 假定：中间 上/下跳is1
+                            
+                    ---
+
+                - 引入reason
+                    - 同步
+                        - 收发双方'data
+                    - 适用于
+                        - 二进制digital
+        - **调制**
+            - >data→模拟
+            - 4调制
+                - QAM
+               
+     - --
+
+- transport**介质**：
+    - 4 type
+        - 双绞线
+            - 绞合
+                - decline 电磁干扰
+        - 同轴电缆
+            - 屏蔽
+                - ..
+                    - (抗干扰更好
+            - 通信way
+                - 单工
+        - 光纤
+            - 原理
+                - 光 全反射
+            - type
+                - 单模
+                    - 直径↓到足够小
+                        - 光沿直线传播
+        - 无线
+            - satellite通信
+                - cost高，时延长
+                - 受气候influence
+                - 保密差，误码率高
+    - 4特性
+        - >物理层 接口特性/规范
+
+    ---
+
+- equipment
+    - 中继器Repeater
+        - signal
+            - **再生**衰减signal
+                - not放大
+                    - <span style="color:lightgray">放大器/转发器</span>
+                        - <span style="color:lightgray">放大再生</span>
+        - 作用
+            -  as signal'电气部分
+            - makes 信号传输得更远
+            - as 段间相连
+                - ↑粗缆组网过长，分段
+                    - max 4个 Repeater
+                        - "5-4-3"
+                            - 网段
+                            - Repeater or Hub
+                            - 3个主机段 (among 5
+            - link
+                - 不同介质'LAN
+                    - ask same 传输v、协议
+            - 
+    - 集线器Hub
+        - link后设备形成
+            - 物理
+                - 星形
+            - logic
+                - 总线
+        - 域
+            - 同 冲突、广播
+        - port
+            - 1进n-1出
+        -  带宽
+            - computer至多占用
+                - $带宽_{Hub}/台数$
+    - --
+    - 2网段 link in物理层
+        - 传输v 相同
+        - data链路层 protocol
+            - can不同
+                - ↑ 物理层can't识别
+    - --
+    - 2q
+        - 关于"连接"
+            - 物理层连接 ← link这一操作
+            - 中继器 ← link后 还需通信
+        - 关于"放大"
+            - 确实描述repeater和hub不准确，很笼统说法，选更错的
+        
+## 数据链路
+## △网络
+## ➹传输
+## 应用
 
