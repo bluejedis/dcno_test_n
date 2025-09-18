@@ -344,7 +344,7 @@
                             - Repeater or Hub
                             - 3个主机段 (among 5
             - link
-                - 不同介质'LAN
+                - 不同介质'**LAN**
                     - ask same 传输v、协议
             - 
     - 集线器Hub
@@ -384,6 +384,7 @@
         - 计时器 超时重发
     - protocol
         - HDLC 
+            - >专属于 ISO
         - PPP←SLIP
 - 组帧
     - HDLC组帧
@@ -407,17 +408,575 @@
                     
             - ==CRC==
                 - >can detect all 单bit error
-        - hamming←纠错
+                    - can use 硬件 to complete
+               - r个检验位
+                   - 可检验到all $length \le r$的突发error
+               - 发送、接收方
+                   - >商定一个多项式
+                   - 发送：模2除法(异或运算)
+                   - 接收：验证
+                       - 接受data xor G(x)
+                            - 余数为0，则无错
+                        - 校验位 位数(从最低位划分)=G(x)最高阶 阶数
+                            - 余下高位为数据data
+                - step
+                    ->多项式$G(x)=X^4+X+1$对应2进制位
+                        - 即 10011
+                    - ？具体是怎么算的
+                        - >数据位+检验位
+                        - 数据位 同 补齐G(x)最高阶 阶数 一样位数的0
+                        - 数据位 xor G(x)
+                        - 余数即校验位
+                        - q
+                            - 为什么07题第一步是 数据位+0？← 按G(x)最高次位数补齐
+                                - 再模运算G(x)得到的余数，即检验位
+                                - 
+                            - 08题从选项ensure数据位
+               
+             ---
+        - hamming←纠错<span style="color:lightgray">?整体原理是什么</span>
             - >纠正一位
+            - 位数：
+                - d位
+                    - “纠错”d位,码距为2d+1
+                    - “检错”..., ...d+1
+                - 冗余位r
+                    - >k bit信息位，附加上r bit冗余位
+                    - $2^r \ge k+r+1$
             
     - 流量..，可靠传输
         - 流量..
             - >actually control 发送方 data流量
-            - 
-    - 介质访问
+            - 滑动窗口协议
+                - <span style="color:lightgray">？主要也是分为s-w 、连续AQR吗？←✓</span>
+                - >接收方向发送方反馈信息
+                - w大小
+                    - 也是分三个协议约束
+        - 可靠传输
+            - >ARQ
+            - **S-W**
+                - $W_{T/R}$=1
+                    - >发1，收1；set超时机制
+                - **信道利用率U**
+                    - $\frac{\overbrace{data帧发送t*窗口size}^{t_{发_总}}}{\underbrace{..发送_{1个}+往返+确认帧发送_{1个}}_{T}}$
+                        - U极低
+                            - 往返时延＞数据帧的发送..
+                                - $\Leftrightarrow$ $v_send$↑,$t_send$↓；distance远，往返t ↑
+                        - max
+                            - >不含确认帧发送
+                - judge帧whether重复
+                    - 帧编号
+                - 中途数据丢失
+                    - 发送方在经过超时时间后未收到ACK帧
+                        - 自动重发此帧
+                                
+            ---
+            - 连续ARQ:
+                - >both need 按序接收
+                - ==**GBN**==
+                    ->累积确认，以last receive为准
+                    - $W_T＞1$ $W_R=1$
+                        - size
+                            - 序号/编号个数≥W_T+W_R ?← 我这样总结对吗
+                                - ..≥$W_T+1$
+                                - →$W_T\le 2^n-1$
+                                    - <span style="color:lightgray"> ↑ 连续ARQ 的滑动w 都适用 ？？SR就不行吧，14题 答案这么说准确吗 ← SR的范围更小？← 就是不准确，这里的1就是$W_R$取1，SR是两者相加$≤2^n$</span>
+                                    - ![Screenshot_2025-09-18-08-43-08-009_com](https://bluejedis.github.io/picx-images-hosting/network/Screenshot_2025-09-18-08-43-08-009_com.microsoft.emmx.canary-edit.9kgjj87kcl.jpg)
+                    - U
+                        - 100%
+                            - >T内，不停send
+                            - $W_T \ge \frac{T}{t_发}$
+                            - $2^n \ge W_T$
+                                - <span style="color:lightgray">(SR同理</span>
+                    - $V_{max}$
+                        - ?为什么25题是数据/(确认时延+往返时延)
+                        - 这和信道利用率U中的传输速率不一样吗
+                            - ![IMG_20250918_110223](https://github.com/bluejedis/picx-images-hosting/raw/master/network/IMG_20250918_110223.3yet5i7fyf.jpg)
+                            - ![IMG_20250918_110223](https://github.com/bluejedis/picx-images-hosting/raw/master/network/IMG_20250918_110223.3yet5i7fyf.jpg)
+                    - **帧序号** 比特数
+                        - $U=W_T\frac{t}{T}$
+                        - $W_T\le 2^n-1$
+                        - ？为什么26题，单设一个L，之前不都是用帧长算的吗？为什么这里和帧长没有关系了
+                            - ![ ](https://github.com/bluejedis/picx-images-hosting/raw/master/network/IMG_20250918_112620.5mo62pul4h.jpg)
+                            - ![ ](https://github.com/bluejedis/picx-images-hosting/raw/master/network/IMG_20250918_112610.13m4zqp48s.jpg)
+                   
+                - **SR**
+                    - >**无序**接收
+                        - 不超时'situation下
+                            - get 确认帧&继续send剩余
+                            - >"收到了0~3"，又收到"5"
+                                - ↑5还未确认
+                    - $W_{T}\ge W_{R}$＞1
+                        - $W_T+W_R≤2^n$
+                            - 反eg.开头0 结尾0←总长为$W_T+W_R$
+                                - 发送满，暂停；接收期望后面0
+                                - 发送again，接收不知新旧
+                        - → max: $W_{T/R}≤2^{n-1}$
+       ---
+     - **介质访问**
+         - 信道划分 ..控制
+             - >静态 ← 不会冲突
+                 - through TF WC
+                - 广播→点对点
+                    - <span style="color:lightgray">add:集中式介质访问
+                        - 集中控制，解决次序问题</span>
+                - type：
+                    - TDM
+                        - > share 时间
+                            - 发送端
+                                - 将不同用户的信号相互**交织**在不同的时间片内
+                            - through 同一个信道传输
+                            - 接收端
+                                - 将各个时间片内的信号提取出来,还原
+                        - **condition**:
+                            - 位速率(二进制位数/s)
+                                - 介质..＞single 信号..
+                            - 带宽
+                                - 介质.. ＞ 结合 信号..
+                                    - <span style="color:gray">(所能传输信号' 最高f - 最低f ＞ 调制后 复合信号..</span>
+                        - 分类:
+                            - >按 静(预先)/动态 划分时间片(时隙
+                            - 同步TDM
+                            - 异步..(统计..
+                        - compare：
+                            - to FDM
+                                - 抗干扰能力强,可以逐级再生整形,避免干扰积累
+                                - suite for **数字**信号
+                                    - <span style="color:lightgray">更易 自动转换</span>
+                    - FDM
+                        - >share空间
+                        - suit for 模拟
+
+                    - --
+                    - **CDM**
+                        - >share both 时间 and 空间
+                        - principle：
+                            - 将码片中的0写为-1
+                            - 将1写为+1
+                        - 正交性
+                            - 码片序列 两两间 规格化内积=0
+                        - 求解
+                            - get序列按 原序列个数 分组
+                            - 各组按高→低 与send序列内积/m
+        ---
+          - **随机访问**..
+             - >动态←might冲突
+             - ALOHA
+                 - 纯..
+                     - >各站点自由send
+                     - 冲突：
+                         - 随机时间 重传
+                 - 时隙..
+                    - >..only 时隙开始
+                    - 冲突：
+                        - 同理
+             - CSMA
+                 - CSMA
+                    - 非坚持
+                        - 信道空闲：
+                            - 立即
+                        - ..忙：
+                            - 随机监听
+                    - p-坚持
+                        - ..
+                            - 以概率p send
+                            - ..$1-p$推迟到next时隙
+                        - ..忙：
+                            - 持续监听(下一个时隙再begin)，直至空闲
+                    - 1-坚持
+                        - ..
+                            - 立即<span style="color:lightgray"> ←以概率1</span>
+                        - ..忙：
+                            - 坚持继续
+                 - --
+                 - CSMA/CD
+                     - >总线形网络or**半**双工
+                         - 全双工no need<span style="color:lightgray">←发送 接收 2条道</span>
+                     - 争用期：
+                         - 信号 往返传输的**t** between最远两个端点 
+                             - (2*总线传播t
+                             - =最长 冲突检测t
+                     - 原理
+                         - "先听后发，边听边发，冲突停发，随机重发"
+                     - 帧
+                         - 长度
+                             - 不limit
+                                 - might与其他站'帧冲突
+                         - $t_{send}$缩短
+                             - ？为什么 “增加最短帧长 可以 增
+加发送帧的时间”(在传输速率增高的背景下)？？← "最短帧长"is$\Delta t$取2t的特殊情况，$\Delta t=\frac{L}{v}$
+                              - 故有$\Delta t=\frac{\Delta L}{v_{介质传输}}$
+                                  - 最短帧长减少800bit,则发送帧的时间减少0.8μs
+                                - ![IMG_20250918_142244](https://github.com/bluejedis/picx-images-hosting/raw/master/network/IMG_20250918_142244.6iknic9fh4.jpg)←there，"最短帧长"直接understand为帧长L，与争用期无关，$\Delta t=\frac{L↑}{v}$
+                     -  count
+                        - 最短**帧长**
+                            - >goal：帧的发送t ≥争用期
+                                - $\Delta t=\frac{L}{v_{介质传输}}$
+                            - $2t \cdot v_{信号传播}$
+                                - 降低t
+                                    - decline 中继器
+                                        - **hub** 
+                                            - >..到 各站 d $\Leftrightarrow$各站之间 d*2<span style="color:lightgray">（hub是中间商）</span>
+                                            - 此时，往返时延=传播.. -hub转发..
+                                            - ？为什么这里求以太网最短帧时间，默认用的100Mb/s，依据在哪里 ← 题中100**baseT** 即100Mb/s
+                                                - ![IMG_20250918_171149](https://bluejedis.github.io/picx-images-hosting/network/IMG_20250918_171149.70ap73bhyh.jpg)
+                             - $\Delta$后各站路程
+                                 - $\frac{\Delta t}{2}$*v ← <span style="color:lightgray">争用期是 往返</span>
+                        - **二进制退避**
+                            - >consider 负载 对冲突' 影响
+                            - 重传推迟时间：r*2t
+                                - r: 离散整数集合$[0,1,⋯,2^{min(k,10)}-1)]$中随机取数
+                                    - k:重传次数
+                                        - >notice：冲突4次，再次重传前等待
+                                            - 即 只count 重传4次
+                                - k↑,帧重传时再次发生冲突的概率越低
+                            - default: 以太网
+                                - >最短帧长：512b
+                                    - if 10Mb/s → 51.2us
+                                    - .. 100.. →5.12us
+                                        - 第二次重传：
+                                            - r=$2^2-1$
+                                - hint：100BaseT
+                                    - 100Mb/s
+                                - --
+                                - 例外：给了具体的 长度=1km
+                                    - 则 传播时延=$\frac{长度 km}{v km/s}$
+                        ---
+                        - compare
+                            - to TDM
+                                - 信道的利用率
+                                    - CSMA/CD用户共享信道,更灵活,U↑
+            
+                              
+                     ---
+                 - ../CA
+                     - >原因：有时../CD不适用 ←无线局域网802.11
+                         - 信号
+                             - 接收.. $\ll$发送..
+                             - 无线介质.. 强度 动态变化 range大
+                         - 隐蔽站
+                             - 不是all都能hear
+                             - 暴露站
+                                 - range内 detect到 忙
+                                     - 实际 不影响
+                     - ACK帧 ← CA
+                         - >get ACK， 确认 数据帧 arrive
+                     -  IFS(帧间间隔)
+                         - >持续检测到信道空闲一段指定时间后才能发送帧
+                         - type
+                            - S..
+                                - >最短
+                                - 控制、确认帧
+                            - P..
+                                - >中等
+                                - AP
+                            - D..
+                                - >..长
+                                - 数据帧
+                        - 信道预约：
+                            - >请求发送RTS，清除发送CTS帧
+                                - RTS→无线站点(AP)--广播→CTS
+                            - ![](https://cdn-mineru.openxlab.org.cn/model-mineru/prod/2674c2b5b366aab47d9a818ebdb238e29926b42fa0b01c12631f7f41d08ac0bc.jpg)  
+                            - 普通模式下 no need
+            ---
+          - 轮询..(令牌环 网络
+             - >动态,but不冲突
+                 - suite for 负载重 ← <span style="color:lightgray">越重，冲突↑，but对其不影响</span>
+             - 环
+                 - all结点, same信道← share带宽
+             - 令牌
+                 - >一个令牌不停地在环中流动 ←单向逐站
+                     - only令牌flow
+                        - wait for令牌到达
+                            - change标志位+附加数据
+                        - token→一个数据帧
+                 - 结点：
+                    - only got 令牌的结点(in令牌持有时间内) can send data
+                        - others 接收/转发
+                            - if got 令牌 sended by itself
+                                - 不再转发，produce 新的token→next
+                                    - ↑goal：recycle 数据帧
+                        - 无数据发送 结点 立即传递after getting
+                    - 同一time，only一个结点can get
+                        - 半双工通信
+                    - $t_{结点→结点}$
+                        - 结点数、v、帧长
+                ---
+                -  worst situation：
+                    - >all 站点 都要发送data
+                        - 一个站点$t_{wait}$
+                            - =all站点 传递token+发送帧' time
+- --
 - LAN WAN
+- LAN
+    - >物理，数据链路
+    - 以太网
+        - >a实现方式of LAN
+        - topo
+            - 物理
+                - (扩展)星形
+            - logically
+                - 总线
+        - 通信
+            - 2methods简化通信
+                - 无连接；
+                - 数据帧 无编号
+                - 接收方 不发送 ack
+            - 方式
+                - 广播式网络
+                    - >share信道，work in 数据链路←no Router or 网络 layer
+                        - need 服务
+                            - use物理层..
+                            - 向高层provide..
+                    - 大量 广播 decline whole网络性能
+                        - every computer need 处理 每个 广播 message
+          - 协议
+               - 实现through**网卡**
+                   - 时钟have same f
+                       -  >曼切斯特
+                       - ↑双方同步，自含时钟
+                    - find 帧' 目的MAC地址
+                        - 非自己→直接丢弃
+                       
+            - control
+                - **地址**
+                    - >即mac地址← function：控制 协调 all站点 对共享介质' visit
+                        - >寻址，差错检测，组帧拆帧
+                        - through ARP get
+                    - 2 have same MAC地址
+                        - 2个neither 正常通信
+                        - --
+                    - 数据载荷
+                        - >46~1500
+                        - 小于则填充
+                - LLC
+                    - >建立 释放逻辑连接，provide与高层接口，差错control，给帧加序(待确认service)
+                    - <span style="color:lightgray">？↑不是说 简化通信的方式是 不给数据帧编号吗，为什么这里又要给帧加序？</span>
+                   
+        - --
+        - 快速以太网
+            - >keep最短帧长，decline 长度，提高v
+            - MAC帧format 与标准.. same<span style="color:lightgray">(向后兼容)</span>
+        - 传统..
+            - >广播
+                - A→B
+                    - C D等都能hear
+        - --
+        - 吉比特以太网
+            - >CSMA/CD
+                - except for10吉比特以太网(全双工
+                - ↑all v＞10Gb/s 的 均全双工
+            - 2 standards
+                - 802.3z
+                    - 光纤
+                - .. .3ab
+                    - 4对UTP5
+        - 100Base-T:
+            - >CSMA/CD
+            - 100标识传输速率为100Mb/s; 
+            - base标识采用基带传输;
+            - T表示传输介质为双绞线(包括5类UTP或1类STP)
+                - 为F时表示光纤。
+                - add.
+                    - 10Base-5(粗缆
+                        - max 500m
+                    - 10Base-2(细缆
+                        - 最长length：200m(actually185
+    - --
+    - 802.3
+    - 802.11
+        - 首部字段：
+            - 4个
+                - addr1、2、3、(4)
+                - 去AP
+                    - AP ++A++ B
+                - 来自..
+                    - B ++AP++ A
+                    - <span style="color:lightgray">↑ 中间Keep" 来自位"</span>
+            - 含义
+                - up to
+                    - To DS 和 From DS位
+                        - DS: 分布式系统
+                    - (.. AP..AP
+    - VLAN
+        - >based on交换technique
+            - 链路聚合 ←解决 交换机 带宽 瓶颈，not VLAN
+            - >隔离 not only 冲突域 but also 广播域
+        - 802.1Q帧
+            - >add 4B 标签字段(VID) in原始 以太网帧
+                - Max帧长changed to 1522B
+                    - 1518+4
+            - used in 干线链路
+                - same交换机 sameVLAN下 通信，no need to use
+        - 划分
+            - 基于 接口
+            - ..  MAC地址
+            - .. IP地址
+---
+- WAN
+    - >.., ..,网络layer
+    - toppo：
+        - 网状
+    - compare
+        - to LAN
+            - >协议、网络技术 不同
+            - WAN: PPP
+            - LAN: 广播
+                - link WAN&LAN
+                    - 路由器
+    - 通信
+        - ..子网
+            - >分组交换
+        - 传输way
+            - 存储转发
+    - **PPP**
+        - >有连接，不可靠
+        - 透明传输(default异步线路)
+            - >字符填充
+            - ↑PPP 面向 Byte
+                - all 帧长is whole byte
+        - function
+            - 差错control
+                - ↑不纠错
+            - support **different 网络层协议**
+                - still use same PPP 通信
+            - 动态分配 IP地址
+                - 拨号连接
+            - 身份鉴别
+                - after 建立 LCP
+        - 组成
+            - 链路 控制协议(LCP
+                - function：
+                    - >在建立状态阶段 negotiate 数据链路协议 的option
+            - 网络.. (N..
+            - a 方法 of 将 IP数据报 封装到 串行链路
+---
 - 设备
+    - **交换机**
+        - >same广播域，different冲突域
+            - 80%通信量in 本LAN
+                - need set 交换机
+                    - can 分为较小 冲突域← 减少 冲突&延迟
+        - 分割网络
+            - add网络带宽 in一定条件
+            - >广播域fixed
+        - 总带宽
+            - along with 接口结点的增加, 而↑
+                - 结点obtained带宽，won't decline 随着 数目的↑
+                - eg.
+                    - 10Mb/s共享以太网(switch link
+                        - every user obtains 10
+                    - 半双工
+                        - sum时 need ÷2
+                        - (未说，default 全
+        - 协议
+            - >work in 链路层，can't 与 different 网络层protocol互连
+            - --
+        - type
+            - 以太网交换机
+                - ==**自学习**==function
+                    - 指：
+                        - record
+                            - 帧' 源MAC地址
+                            - this 帧 enter 交换机' 接口号
+                        - store the massage above in 交换表
+                    - 原理
+                        - >泛洪，转发，过滤
+                        - 泛洪
+                            - 未登记则全发(除send接口
+                                - eg.
+                                    - A→B，所有都会registerA
+                                        - H→A直找
+                                    - X→E，....X
+                                        - E→X，直找
+                                    - hub不可隔离冲突域，无表
+                                        - H2→H4
+                                        - H4→H2
+                                            - H3也会收到
+                                            - ![Screenshot_2025-09-18-20-51-44-796_com](https://bluejedis.github.io/picx-images-hosting/network/Screenshot_2025-09-18-20-51-44-796_com.microsoft.emmx.canary-edit.9ddboikffw.jpg)
+                        - 转发
+                            - PDU(数据段)地址
+                                - >as 多接口 网桥 work in数据链路层(use物理地址)
+                                - → 目的物理
+                            - **转发**时延
+                                - 直通交换way
+                                    - >only check目的帧(6B)
+                                    - min..时延：$\frac{6B}{v}$
+                                        - ↑attention：问 转发时延，和上一章separate
+                - 接口 receive 帧：
+                    - if 未find 目的MAC地址 in交换表
+                    - send to all 接口 (除itself
+        -  --
+        - compare 
+            - to hub
+                - 支持多用户 同时通信
+---
 ## △网络
+- Function
+    - 主要目的：
+        - >∀结点间 数据报 传输
+            - (IP数据报不可靠
+        - --
+    - 异构网络：
+        - 物理层、数据链路层 both不同
+            - 特性(defined in2层'协议：
+                - 异构性是指
+                    - 传输介质、数据编码方式、链路控制协议
+                    - 不同的数据单元 格式和转发机机制
+        - --
+    - 拥塞：
+        - 负载↑，吞吐量反而↓
+    - VC DG
+        - VC
+            - >逻辑上 连接 ←not 物理
+            - 分组转发
+                - 建立VC
+                    - Group need carry whole目的地址←for路由器选择
+                - after,..虚电路号(VCID)
+                    - 分组 belonging to sameVC
+                        - pursuant to 同一路由 转发
+                - 分组 到达order same as发送..
+                    -<span style="color:lightgray"> can ensure 有序</span>
+        - DG
+    - **SDN**
+        - openflow
+            - ..交换机
+                - 匹配+动作
+            - ..协议
+                - 平面间接口
+        - 远程控制器
+            - >count 最佳路由
+            -  replace 路由protocol
+        - 接口
+            - 北向
+                - 编程接口 for 上层开发者
+            - 南向
+                - 控制&数据 平面 通信
+    - 路由器
+        - 互连的多个LAN
+            - 下三层协议can 不同
+                - eg.网络layer(互连IPv4、IPv6
+            - 网络层以上'高层协议must相同
+        - **路由表**
+            - include
+                - **目的网络** 
+                    - <span style="color:lightgray">↑contained many 目的主机 IP地址</span>
+                - 下一个**IP地址** in arriving 目的.. 路径
+        - 分组转发
+            - >存储转发
+                - first receive整个分组
+                    - 错误check
+                    - if 出错,则丢弃;
+                - else store该分组
+                    - 转发Group→端口
+                        - as to路由选择协议
+            - according to
+                - 报文' IP地址
+        - 广播域
+            - 可分割
 ## ➹传输
 ## 应用
-
+---
+流量control：解答left04~07
+介质访问control：综合left 04、05
+---
