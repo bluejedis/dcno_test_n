@@ -1,7 +1,7 @@
 # 概述
 
 - network
-    -definition
+    - definition
         - **自治** 、互连、集合体
     - 功能
         - data**通**信、资源**共**享、分布式 | 可靠
@@ -61,7 +61,7 @@
                         - $组{\color{green}数}=\frac{file大小}{实际容量}$
                             - 实际容量=分组大小-分组头
                 - $t_{{Router}_{last}}$
-                    - 2* $\frac{1个分组大小}{v_{传输}}$
+                    - 2*$\frac{1个分组大小}{v_{传输}}$
                         - 前999个分组都包含在send时间内
                         - 选2个Router线路 ←题求 至少
          - --
@@ -101,3 +101,323 @@
         - 标准语言、..界面、功能间独立性
         - no
             - defin功能 执行方法
+
+- 实体
+    - is 软件/硬件
+        - to实现该layer功能
+    - 协议
+        - 通信的规则or约定
+            - between 不同结点对等实体
+
+    ---
+- OSI
+    - n层为n+1层服务
+        - eg.数据链路for 网络层实体
+            - provide data 发送、接收及过程
+    - 各层provide各自 差错control
+        - eg.
+            - bit流 ←物理
+            - 帧 ← data链路
+            - 打印 ←应用
+    - 3main概念
+        - 服务 接口 协议
+            - 协议
+                - 3要素
+                    - 语法、语义、同步(时序)
+                        - TCP中 "三握"belongs to
+                            - 时序
+                                - (先后顺序
+                        - 语法
+                            - 信息'格式
+                                - eg.IPv4首部
+    - 未define 各layer接口'实现
+        - left to 各 协议&standard
+        - --
+    - 各layer
+        - 应用
+        - 表示
+            - data解密与加密、压缩、format转换
+        - 会话
+            - 会话管理&同步
+                - eg.file插入同步点or检查(检验)点
+            - 
+            - --
+        - ==**传输**==
+            - 通信
+                - 主机++进程++
+                - 端2端 (_传输层及以上_
+                    - 应答、分组排序，流量control
+                        - 流量control←2、3、4layer (mainly
+                            - 2：点2点
+                            - 3：whole net
+                            - 4: 端2端
+            - PDU called as
+                - 数据段
+                    - add 源端口信息、目的..
+                    - 
+        - **网络**
+            - provide 无连接，面向连接
+                - _(O网，T传_
+                    - link都是 有确认
+                        - ∴ only3link way
+                            - 无确认无连接
+                            - 有..无..
+                            - 有..面向..
+            - 封装成 分组 add
+                - 第三层'PCI
+                    - protocol control information协议控制信息
+                        - (地址、控制info
+            - host2host
+                - Router选择、拥塞控制，网际互连etc
+            - --
+        - 数据链路
+            - **点2点**
+                - 物理线路→数据链路
+            - don't own 拥塞control
+            - add in分组
+                - 源地址、目的..
+                - control信息
+            
+        - **物理**
+            - don't have Next，故 不封装
+            - equipment
+                - 中继、集线器hub(<span style="color:lightgray">多port..</span>)
+
+    ---
+- TCP/IP
+    - > 实际执行standard；互联网核心tech
+    - 各layer
+        - 应用
+            - 服务访问点(SAP
+                - 接口of上下layer实体
+                - called as
+                    - 用户程序
+                    - 
+        - ==传输==
+            - sap
+                - port号
+            - 无连接，面向..
+                - 可靠、流量control、错误校正etc
+        - 网络
+            - sap
+                - IP数据报’protocol字段
+            - only 无连接(不可靠
+                - can't 点2点'流量control
+                    - _osi can_
+            - --
+        - 数据链路
+            - sap
+                - 帧'type
+
+    ---
+- ARPAnet
+    - first 计网
+    ---
+
+？模型各层间顺序究竟是自上而下，还是自下而上？ 为什么第n层为第n+1层提供服务，但数据链路又是将 有差错的物理线路转换为无差错的数据链路？
+
+   
+---
+# detail
+## 物理(left 
+
+- **通信base**:
+    - element
+        - computer内部data传输
+            - 并行
+                - feature: d短 v快
+                    - communication way:
+                        - 同步、异步
+        - 信道
+            - 通信'电路contain
+                - 双向..
+                    - 2信道
+                        - send..，receive..
+                - 多user共用
+                    - every user have
+        - count related:
+            - 传输v
+                - >每秒bit数
+                - $V_max$
+                    - 影响因素
+                        - 信道带宽
+                        - 信噪比 _（香农）_
+                        - count
+                            - 无noise
+                                - 奈：$2Wlog_2V$
+                                    - w:信道
+                                    - v:种类
+                                        - 状态、级别etc
+                            - 信噪比$\frac{S}{N}$
+                                - 香：$Wlog_2{1+\frac{S}{N}}$
+                                - attention:
+                                    - 含 隐藏==种类==
+                                        - $\min\\{奈,香\\}$
+                                    - S/N
+                                        - 为dB需换算
+                                            - $S/N=10^{\frac{x}{10}}$
+                                        - 信号功率S、噪声功率N 
+                                            - 代入
+                                    - $w=f_{上限}-f_{下限}$
+            - Baud率
+                - >每秒 变化次数
+                - 求数据率
+                    - ensure编码方式
+                        - 以太网→曼切斯特
+                            - 1位数据(bit) need 2电平
+                            - ∴data率=1/2baud率
+                - 求 码元数'有效离散值
+                    - $bit率=baud率×k$($n=2^k$
+                        - k为 1码元contain'bit数
+                    - eg.baud率=1000Baud，v=4kb/s
+                        - ∴k=v/baud率=4
+                            - n=2^4
+    - code 调制
+        - **编码**
+            - >digital数据 coded as digital signal；<span style="color:lightgray">模拟数据..</span>
+            - 曼切斯特code
+                - signal contain
+                    - 时钟
+                        - 中间跳变
+                    - data
+                        - different 跳变way
+                - wave
+                    - 假定：中间 上/下跳is1
+                            
+                    ---
+
+                - 引入reason
+                    - 同步
+                        - 收发双方'data
+                    - 适用于
+                        - 二进制digital
+        - **调制**
+            - >data→模拟
+            - 4调制
+                - QAM
+               
+     - --
+
+- transport**介质**：
+    - 4 type
+        - 双绞线
+            - 绞合
+                - decline 电磁干扰
+        - 同轴电缆
+            - 屏蔽
+                - ..
+                    - (抗干扰更好
+            - 通信way
+                - 单工
+        - 光纤
+            - 原理
+                - 光 全反射
+            - type
+                - 单模
+                    - 直径↓到足够小
+                        - 光沿直线传播
+        - 无线
+            - satellite通信
+                - cost高，时延长
+                - 受气候influence
+                - 保密差，误码率高
+    - 4特性
+        - >物理层 接口特性/规范
+
+    ---
+
+- equipment
+    - 中继器Repeater
+        - signal
+            - **再生**衰减signal
+                - not放大
+                    - <span style="color:lightgray">放大器/转发器</span>
+                        - <span style="color:lightgray">放大再生</span>
+        - 作用
+            -  as signal'电气部分
+            - makes 信号传输得更远
+            - as 段间相连
+                - ↑粗缆组网过长，分段
+                    - max 4个 Repeater
+                        - "5-4-3"
+                            - 网段
+                            - Repeater or Hub
+                            - 3个主机段 (among 5
+            - link
+                - 不同介质'LAN
+                    - ask same 传输v、协议
+            - 
+    - 集线器Hub
+        - link后设备形成
+            - 物理
+                - 星形
+            - logic
+                - 总线
+        - 域
+            - 同 冲突、广播
+        - port
+            - 1进n-1出
+        -  带宽
+            - computer至多占用
+                - $带宽_{Hub}/台数$
+    - --
+    - 2网段 link in物理层
+        - 传输v 相同
+        - data链路层 protocol
+            - can不同
+                - ↑ 物理层can't识别
+    - 为终端结点隐蔽物理传输'细节
+        - 无差别bit传输
+    - --
+    - 2q
+        - 关于"连接"
+            - 物理层连接 ← link这一操作
+            - 中继器 ← link后 还需通信
+        - 关于"放大"
+            - 确实描述repeater和hub不准确，很笼统说法，选更错的
+        
+## 数据链路
+- function
+    - control对 物理传输介质'访问
+        - MAC层
+    - avoid帧丢失'method
+        - 计时器 超时重发
+    - protocol
+        - HDLC 
+        - PPP←SLIP
+- 组帧
+    - HDLC组帧
+        - default 0bit填充
+    - 3way运用
+        - 字符count
+            - 开头use 二进制 count total字符数(include自身
+        - 首尾add FLAG
+            - 字节填充
+            - 0bit
+- ==3control==
+    - 差错..
+        - 检错
+            - ？？奇偶校验码
+                - >only detect奇数个bit error
+                - 附加1个检验位
+                    - >奇偶，is 最终滤网，规定则过
+                        - code_origin
+                            - meet，写0
+                            - 不..，则要+1 去meet
+                    
+            - ==CRC==
+                - >can detect all 单bit error
+        - hamming←纠错
+            - >纠正一位
+            
+    - 流量..，可靠传输
+        - 流量..
+            - >actually control 发送方 data流量
+            - 
+    - 介质访问
+- LAN WAN
+- 设备
+## △网络
+## ➹传输
+## 应用
+
