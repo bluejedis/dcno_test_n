@@ -25,6 +25,9 @@
                 - ↑减少 传输delay
         - drawback：
             - 附加info 开销大
+            - --
+        - type：
+            - VC,DG(←网络layer
         - --
         - 无Link分组:Datagram数据报
             - every group 独立路由
@@ -32,7 +35,11 @@
 
     - 电路
         - 时延min，无差错
+            - >no 差错控制
     - 报文
+        - size 不fixed，storage空间大
+        - 不能 used in 实时
+            - ↑ 接收、store、转发' time 很长
 ---
 - count
     - > 1B=8b
@@ -430,8 +437,9 @@
                         - q
                             - 为什么07题第一步是 数据位+0？← 按G(x)最高次位数补齐
                                 - 再模运算G(x)得到的余数，即检验位
-                                - 
+                                - ![IMG_20250918_073805](https://bluejedis.github.io/picx-images-hosting/calculus/IMG_20250918_073805.7lkcsts4tq.jpg)
                             - 08题从选项ensure数据位
+                                - ![IMG_20250918_073606](https://bluejedis.github.io/picx-images-hosting/calculus/IMG_20250918_073606.67xtosh2uo.jpg)
                
              ---
         - hamming←纠错<span style="color:lightgray">?整体原理是什么</span>
@@ -923,21 +931,53 @@
                 - 异构性是指
                     - 传输介质、数据编码方式、链路控制协议
                     - 不同的数据单元 格式和转发机机制
+    - 协议
+        - >网络layer：IP; ARP、DHCP、ICMP
+            - TCP is 传输
         - --
     - 拥塞：
         - 负载↑，吞吐量反而↓
+        - --
     - VC DG
+        - >both belong to 分组 交换technique
         - VC
-            - >逻辑上 连接 ←not 物理
-            - 分组转发
+            - >逻辑上 连接 (←not 物理
+                - **可靠**
+                - 自身 差错、流量控制
+            - step：
                 - 建立VC
                     - Group need carry whole目的地址←for路由器选择
                 - after,..虚电路号(VCID)
-                    - 分组 belonging to sameVC
+                    - 分组 belonging to 同一 VC
                         - pursuant to 同一路由 转发
+                        -<span style="color:lightgray"> (↑同一报文，不同path needs DG）</span>
                 - 分组 到达order same as发送..
                     -<span style="color:lightgray"> can ensure 有序</span>
-        - DG
+            - suite for
+                - 实时性高，长期
+            -  type：
+                - P..(永久性..
+                    - >永久
+                    - no need 建立时间
+                - S..(交换型..
+                    - >临时
+        - DG(IP数据报)
+            - >不可靠；不保序
+                - 由传输层 差错控制
+            - suite for
+                - 出错率高system
+                    - <span style="color:lightgray">↑VC一个node错，整个circuit rebuild</span>
+            - carry IP地址
+                - **源&目的** 地址 ← in首部 &&始终不变
+                    - only NAT会改变源
+                    - compare：MAC地址
+                        - 同一广播域/局域网
+                            - 不变(交换机)
+                        - 跨广播域/经路由器
+                            - 改变
+                                - 源mac: Router的接口mac
+                                - 目的mac：下一跳设备
+        - --
     - **SDN**
         - openflow
             - ..交换机
@@ -952,21 +992,24 @@
                 - 编程接口 for 上层开发者
             - 南向
                 - 控制&数据 平面 通信
-    - 路由器
+        - --
+    - **路由器**
         - 互连的多个LAN
-            - 下三层协议can 不同
+            - 下三层协议can 不同 ← also主要实现
                 - eg.网络layer(互连IPv4、IPv6
             - 网络层以上'高层协议must相同
         - **路由表**
             - include
                 - **目的网络** 
                     - <span style="color:lightgray">↑contained many 目的主机 IP地址</span>
-                - 下一个**IP地址** in arriving 目的.. 路径
+                - **下一个** **IP地址** in arriving 目的.. 路径
+                    - 源host 和 中间Router both don't need know 完整path
         - 分组转发
             - >存储转发
                 - first receive整个分组
                     - 错误check
                     - if 出错,则丢弃;
+                        - ↑<span style="color:gray">(255.255.255.255)
                 - else store该分组
                     - 转发Group→端口
                         - as to路由选择协议
@@ -974,9 +1017,456 @@
                 - 报文' IP地址
         - 广播域
             - 可分割
+---
+- IPv4
+    - IP分组
+        - >max length(MTU): 65535B
+            - add.  以太网MTU<span style="color:lightgray">(最大传输单元)</span>：1500B
+            - if 给一个链路MTU=800B, IP数据报长度总1580B(首部20B)
+                - 实际MTU：
+                    - $MTU-首部&被8整除$(向下取整)
+                        - 首部：every分片都要携带
+                        - 片偏移： 8B
+                    - 800-20=780
+                        - 780÷8=97.5 取97×8=776
+                - 分片个数
+                    - $\frac{数据报-首部}{实际MTU}$
+        - --
+        - 字段
+            - 协议..
+                - >上层protocol
+                - 6：TCP
+                - 17: UDP
+            - 版本..
+                - 4 : IPv4
+                - 6:   ..v6
+                ---
+            - 长度
+                - 首部..
+                    - >count单位：4B(32bit
+                        - 最常用是 5×4=20B
+                    - **首部检验**(检验和
+                        ->only check首部
+                        - step：
+                            - 首部--划分→16bit sequence
+                                - 反码$\Sigma$
+                                - 再取sum'反码，write into 检验和字段
+                        - 接收方：
+                            - find 错，直接丢
+                        - discern：
+                            - 伪首部 used in UDP or TCP检验和
+                - 总..
+                    - >..: 1B(8bit
+                    - 与重组无关
+        - 重组
+            - >by 目的Host
+                - 分片by Router
+            - 标识 标志(DF MF)，片偏移
+                - 标志
+                    - DF
+                        - whether允许
+                        - DF=1 ←不可
+                            - 此时，片>MTU
+                                - 丢弃&use ICMP(终点不可达) 向 源Host报告
+                    - MF
+                        - 是否还有
+                - 片偏移
+                    - >unit：8B
+                    - 值100
+                        - 分片前，第800个Byte
+                            - if 首部length字段=5，总..=100
+                            - last编号：
+                                - 100×1B-5×4B=20B
+                                    - 800 is first→879 
+        - TTL（生命期）
+            - TTL-=1 ←每一个Router meet TTL
+                - TTL=0，不再转发
+            - eg.Router遇见TTL=1
+                - 先-1,check?=0
+                - 丢弃&send ICMP(终点不可达类型)to源host
+        - --
+    - IP地址 & NAT
+        - DG
+            - after arriving in 网络layer，要去 目的Host
+                - >主机/路由器←标识by MAC地址
+                - need IP地址 corresponding to物理addr
+                    - ↑**MAC**地址=**物理**
+        - 地址
+            - 分类：
+                - ![IMG_20250919_104943](https://bluejedis.github.io/picx-images-hosting/network/IMG_20250919_104943.1vz0iv5k8b.jpg)
+                - 主机号：均need **-2**
+                    - 2special：
+                        - 主机位全0←网络本身
+                            - <span style="color:lightgray">can't作主机地址</span>
+                        - ....1← 广播地址
+                            - 全1为255
+                                - (D类多播![IMG_20250919_112627](https://bluejedis.github.io/picx-images-hosting/network/IMG_20250919_112627.9kgjktf4jb.jpg)
+                - 网络号
+                    - $2^{n-i}$(i=1,2,3
+                        - only A再-2特殊
+                            - 网络号全0 ←保留地址
+                                - ↑0.0.0.0本机 local net**源**地址
+                            - 127 ←回环(回路)检测
+                        - 192=$2^7+2^6$；224=$2^7+2^6+2^5$；
+                        - ![Screenshot_2025-09-19-10-50-38-563_com](https://bluejedis.github.io/picx-images-hosting/network/Screenshot_2025-09-19-10-50-38-563_com.microsoft.emmx.canary-edit.4n82qxro7l.jpg)
+                    - judge：
+                        - "..59/30"
+                            - 后两位为host位，拆出来也是全1←广播
+                            - ？单播only排除法吗
+            - 匹配(转发
+                - ==最长前缀==匹配
+                    - >choose fixed网络部分 匹配得最多的 among all匹配
+                    - step:
+                        -  .  .  .  . / --十转二进制→4*8bit
+                            - tip
+                                - 取最接近'$2^k$递减相加
+                                    - k为多少，后面have 多少位
+                                    - (8位,最高位$2^7$
+                                - list阶数
+                                - 从低到高写位数(←)
+                                    - ![IMG_20250919_111146](https://bluejedis.github.io/picx-images-hosting/network/IMG_20250919_111146.9kgjksxvk0.jpg)
+                            - "/x "
+                                - 前x位 is 固定不变的"网络部分"
+                                    - "/8" 前8位
+                                - <span style="color:lightgray">(CIDR</span>
+                        - compare目标and路由表'
+                - --
+                - 1个host 有 2个IP地址
+                    - 2个IP地址 from 2个 不同的网络←网络号不同
+        - --
+        - NAT
+            - 3类私有地址
+                - ![IMG_20250919_153545](https://bluejedis.github.io/picx-images-hosting/network/IMG_20250919_153545.70ap8fcgdh.jpg)
+            - NAT会改变 源地址(←私转公
+                - change后，为Router外部(出口)地址
+                    - sometimes，utilize 点对点("/30")计算
+                - 题中not 明确mention，但见 3类私有IP即联想
+        ---
+        - --
+    - ==划分==**子网** 路由聚合
+        - CIDR
+            - >作用：effectively分配IP地址空间&decline路由表数目<span style="color:lightgray">(←路由聚合</span>
+                - discern：作用，<span style="color:lightgray">其划分结果(大划小)</span>
+            - 第一个地址
+                - 令host全0
+        - --
+        - 子网**掩码**
+            - >二进制下，1：网络，0：主机 ←key：化为2进制，判断剩下的**主机位**<span style="color:lightgray">见掩码 算主机位</span>
+                - ↑$2^{主机号位数}$，not point数值，but"步长"
+                    - discern：主机位数
+                        - eg.".0/30"
+                            - 主机号 2位
+                            - 主机位数=$2^2-2$<span style="color:lightgray">←去 全0和全1
+                    ---                    
+            - type:
+                - A (255,0,0,0)
+                - B (255,255,0,0)
+                    - if 指定为(255,255,240,0)
+                        - >count： 240剩余的主机位
+                            - 11110000
+                        - $2^{4+8}-2$
+                    - 第三段剩2主机位
+                        - 10进制为252
+                            -<span style="color:lightgray"> (剩下的2位为3</span>
+                - C (255,255,255,0)
+            - judge:
+                - whether can分配给主机
+                    - 看第一位归类(A/B/C）
+                        - > ＜126，＜191，＜223
+                        - 对应主机位 whether 全0？
+                    - else
+                        - 127回环检测
+                        - 不可超255
+                - 子网前缀分配
+                    - 已知一个已分配，算其子网号<span style="color:lightgray">(去掉网络,主机号← 主机号无关</span>
+                        - tip:观察options相同部分，count不同的后几位即可
+                    - 比对选项子网号，有序列重合的(5位重4位等不能arrange
+                - --
+            - 反求mask
+                - 知2 IP地址，使其work in 同一个子网内
+                    - >mask"与"运算 分别with A/B
+                        - 结果相同
+                            - "与"运算
+                                - 同1 得1<span style="color:lightgray">← 主要考虑</span>
+                                - 有0 为0
+                    - ↑原理：网络号=IP地址 AND mask
+                    - ↑can验证whether 在同一子网
+                        - 不在，则交付 网关
+
+            - --
+        - ==划分子网==
+            - >decline广播域size← net效率&安全
+                - 全0，全1 addr不能用，Host数量↓ ← IP地址u↑
+            - principle
+                - >{网络号,子网号,主机号}←右移 分界线between 网络and主机
+                - eg
+                    - 已知网络号：最多子网; 子网最多有效IP地址
+                        - 198.90.10.0/27
+                            - C类，left 5主机号
+                            - 最多子网：
+                                - 至少2位主机号<span style="color:lightgray">( ←if only 1位，只有0/1，无效)</span>
+                                    - 与"**点对点**"路径 同
+                                        - <span style="color:lightgray">由对面接口地址，可推本接口(不可全0 or 全1)</span>
+                                        - --
+                                - $2^3$
+                            - 最多有效IP：
+                                - 5位全HOST ←1个subnet
+                                - $2^5-2$
+                                    - 去除全0、1
+                            - --
+                            - 知主机号"168.16.84.24/20"
+                                - 求最小&最大可分配IP
+                                - 由"/20"求mask，与主机号"与"，得网络号
+                                    - 去掉全0和1
+                                        - 后面取 .1 .254
+                        - --
+                    - 最小**子网**可分配IP地址数
+                        - >△变长子网划分
+                            - 
+                    - --
+                -  judge
+                    - 有掩码
+                        - 分别同掩码 "与"运算
+                    - 无
+                        - >utilize huffman树
+                - --
+                - 不能正常/直接通信
+                    - >不在同一个子网
+                        - add.此时， host通信
+                            - 分组交由 默认网关转发
+                                - 网关地址usually need to be same with 最近Router端口
+                                    - 又 子网mask=网关mask 即Router mask←由"/27"算
+                            - Router 转发DG 
+                                - 重新封装 源&目的 地址
+                    - 以$2^{主机号位数}$为 区间 划分子网
+                        - ↑ 直接"与"运算 不同位
+                          
+            - --
+            - 路由聚合(超网)
+                - >多个IP→1
+                - 最大公共perfix
+                    - >对应子网掩码：聚合位数取1,其余0
+    - 分组转发process
+    - --
+    - protocol
+        - ARP
+            - IP→MAC
+            - ..请求(广播)
+                - A --5router→B
+                    - 5+1请求
+            -  ..响应(单..)
+        - DHCP
+        - ICMP
+            - >封装于IP数据报←IP直接提供service
+            - type
+                - 询问报文
+                    - 回送请求&回答←PING
+                - 差错报告报文
+                    - type
+                        - 终点不可达
+                        - 时间超过
+                        - 源点抑制←最新standard已不用
+                            - 拥塞
+                    - situation：
+                        - 已分片
+                            - only第一个产生
+                        - 不产生
+                            - 已携带，不再产生
+                            - 多播不产生
+---
+- 由"/x"可直接求mask
+- 全0(自身)、全1(广播)去掉 is 子网背景下(包括router图等
+    - cidr range未说
+        - 与cidr地址 同属一子网
+            - 可直接比较"/x"前的位
+---
+- IPv6
+    - 地址
+        - 长度
+            - >128bit
+                - IPv4 32位
+                - 两者地址空间$2^32$ $2^128$
+        - 首部
+            - decline字段
+            -  无检验和
+            - 长度不可变
+        - 不允许 分片
+            - 直接丢弃
+    - --
+    - 零压缩
+        - "::"(双冒号)在一个addr中只能出现一次
+            - 省略相邻的0
+        - 普通":"起分割作用
+        - 每个区域should 4位16进制
+            - 每个区域 需将开头省略0，补充完整
+                - 结尾不可省略
+- --
+- 路由算法协议
+    - type
+        - 静态/动态
+            - 静态
+                - 手工
+                    - but 路由表随时可改
+            - 动..
+                - 自适应
+                - 实时get网络状态
+        - LS
+            - 路由器泛洪--状态信息→others
+                - routers toppo数据库一致
+                    - Dijkstra最短路径
+            - 快速收敛
+                - 收敛
+                    - 路由表accord with toppo结构
+            ---
+        -  分层路由
+            - >路由器be divided into区域
+            - router知道itself area
+                - 不知道others'
+            - can link different 网络
+                - 大型网络need 分层路由
+        - 自治系统(AS
+            - 划分区域
+                - 泛洪交换链路状态info limited in 区域
+                - info 种类↑，OSPF复杂
+                    - but 通信量↓，OSPF能用于大规模
+                        - OSPF support可变长子网掩码
+        - --
+        - 域间路由
+            - BGP
+                - 域内..
+                    - RIP OSPF
+            - --
+    - RIP
+        - >应用层protocol，based on UDP
+        - 距离-向量
+            - 表record 点自身→others 最短cost
+                - C点 cost表计算
+                    - $D_{C→x}+cost table_x$
+                    - 每个点取min
+        - base:
+            - 间隔更新
+            - 跳数
+                - >through1个路由器 为1跳
+                - max跳数：15
+                    - 16不可达
+                    - 不可达
+                        - 当前path故障
+                        - R3存有其他router的信息
+                            - R3取min{R2+1,R1+1,16}=3
+                            - R2取min{R3_新+1,R1_旧+1,16}={4,3,16}=3
+            - only 向相邻router send(路由表)
+                - find 更优路由直接更新&向near路由广播new
+                - OSPF sends a part of 表
+    - OSFP
+        - 连接
+            - use "Hello"分组 ←与邻居
+        - 更新
+            - 维护 邻居表&toppo数据库
+        - count
+            - last group time:
+                - (router数+1(目的地))*1组1次存储转发时延
+       
+    - BGP
+        - >应用层..,.. TCP
+        - 路径-向量
+            - 可达性info：
+                - path of arriving a certain 网络
+                - "较好"而非 最佳
+
+---
+- IP多播
+    - 多个单播simulate
+        - 带宽和＞origin
+        - 时延 ＞..
+    - 避免环路
+        - 多播转发树
+    - 地址
+        - D类
+        - IP→MAC
+            - 转16进制
+        ---
+    - 互联网多播
+        - 以太网 本身support广播&多播
+        - Internet 路由器、物理网络 many not
+- 移动IP
+    - base step
+        - 代理发现、注册
+            - 代理
+                - 隧道 between 归属(本地)..&外部..
+                    - new可达info
+                        - 通知归属--隧道→外部→移动结点
+                            - ∴间接recieve，可直接发
+        - 分组路由
+            - 单、多、广播
+        - 注销
+    - 地址
+        - 主
+            - 固定
+        - 辅
+            - 动态改变
+- --
+- equipment-路由器
+    - 组成
+        - 控制平面
+            - 路由表
+        - 数据..
+            - 转发表
+    - 路由
+        - 路由选择
+            - 交付
+                - 直接交付
+                    - same网段(子网地址)←"与"操作
+                    - (不涉及 路由器
+                - 间接..
+                    - 最后一个，直接..
+            - 组成
+                - 选择处理机、protocol、表
+        - 路由表 
+            - 组成
+                - 交换structure，I/O端口
+                    - O端口 确定
+                        - 接口标识符
+            - 默认路由
+                - 目的地址&子网掩码
+                    - both 0.0.0.0 ←？之前不是只能作为源，不能作目的吗
+            - 分组转发
+                - 最长前缀match
+    - 功能
+        - LAN互连
+        - 对 IP分组头 差错检验
+            - 丢弃
+            - **不保证** 不丢失
+        - detect拥塞
+            - 合理丢弃，send ICMP(源点抑制
+    - compare
+        - to 交换机
+            - 处理的info更多
+                - thus v更慢← 是all equipment中延迟t最长(through下三层
+            - 不转发广播帧←thus 可分割广播域
+     - parameter
+         - main：传输距离
+      - --
+    - 域
+        - 冲突域
+            - 集合of能发生冲突'all equipments
+- --
+left
+IPv4
+- 变长子网划分 +综合
+    - 最小子网IP数(64
+    - 不知mask，判断是否同一子网(38、65）
+
+路由协议(综合
+多播(MAC映射03
+equipment(综合
+---
 ## ➹传输
 ## 应用
 ---
 流量control：解答left04~07
 介质访问control：综合left 04、05
 ---
+
+---
+首部：
+IP数据报 TCP (UDP
